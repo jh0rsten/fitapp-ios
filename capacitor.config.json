@@ -1,0 +1,14 @@
+{
+  "appId": "com.fitapp.justin",
+  "appName": "FitApp",
+  "webDir": "www",
+  "plugins": {
+    "BackgroundGeolocation": {
+      "locationAuthorizationRequest": "Always",
+      "desiredAccuracy": "Navigation",
+      "distanceFilter": 5,
+      "stopOnTerminate": false,
+      "startOnBoot": false
+    }
+  }
+}
