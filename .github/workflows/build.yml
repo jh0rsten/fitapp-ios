@@ -24,29 +24,31 @@ jobs:
           mkdir -p www
           cp fitapp.html www/index.html
 
-      - name: Init Capacitor iOS
+      - name: Add iOS platform
         run: |
           npx cap add ios
           npx cap sync ios
 
-      - name: Build IPA
+      - name: Build unsigned IPA
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace \
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
             -archivePath build/App.xcarchive \
             archive \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE=""
 
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ios/App/exportOptions.plist \
-            CODE_SIGNING_ALLOWED=NO
+          mkdir -p build/ipa/Payload
+          cp -r "build/App.xcarchive/Products/Applications/App.app" build/ipa/Payload/
+          cd build/ipa && zip -r FitApp.ipa Payload/
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: FitApp-IPA
-          path: build/ipa/*.ipa
+          path: build/ipa/FitApp.ipa
