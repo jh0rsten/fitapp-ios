@@ -2,9 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FitApp">
 <title>FitApp</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -12,14 +12,28 @@
 :root {
   --bg:#F2F2F7;--card:#fff;--text:#000;--text2:#8E8E93;
   --border:rgba(60,60,67,0.15);--accent:#007AFF;--green:#34C759;
-  --orange:#FF9500;--red:#FF3B30;--nav-h:83px;
+  --orange:#FF9500;--red:#FF3B30;
+  --sat:env(safe-area-inset-top,44px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);
+  --sar:env(safe-area-inset-right,0px);
+  --nav-h:calc(49px + env(safe-area-inset-bottom,0px));
 }
 @media(prefers-color-scheme:dark){
   :root{--bg:#1C1C1E;--card:#2C2C2E;--text:#fff;--border:rgba(255,255,255,0.1);}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);}
-.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:var(--nav-h);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-top:calc(env(safe-area-inset-top,44px)+16px);}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);}
+.screen{
+  display:none;position:absolute;
+  top:0;left:0;right:0;
+  bottom:var(--nav-h);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px;
+  padding-top:calc(var(--sat) + 16px);
+  padding-left:calc(var(--sal) + 16px);
+  padding-right:calc(var(--sar) + 16px);
+}
 .screen.active{display:block;}
 h1{font-size:28px;font-weight:700;margin-bottom:16px;letter-spacing:-0.5px;}
 h2{font-size:17px;font-weight:600;margin-bottom:10px;}
@@ -28,7 +42,18 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 .card-row:last-child{border-bottom:none;}
 .sec-title{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin:16px 4px 6px;}
 /* Nav */
-.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(249,249,249,.94);border-top:.5px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;}
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--nav-h);
+  background:rgba(249,249,249,.94);
+  border-top:.5px solid var(--border);
+  display:flex;
+  align-items:flex-start;
+  padding-top:4px;
+  padding-bottom:var(--sab);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  z-index:100;
+}
 @media(prefers-color-scheme:dark){.nav{background:rgba(28,28,30,.94);}}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;font-size:9px;color:var(--text2);padding:4px 2px 0;cursor:pointer;transition:color .15s;}
 .nav-btn.active{color:var(--accent);}
@@ -680,16 +705,22 @@ function persist(){
 function todayKey(){return new Date().toISOString().slice(0,10);}
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-let curTab='training';
+let curTab='training', lbInited=false;
 function goTab(t){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+t).classList.add('active');
   document.getElementById('nav-'+t).classList.add('active');
   curTab=t;
-  if(t==='joggen'){if(!map) initMap(); else setTimeout(()=>map.invalidateSize(),150);}
+  if(t==='joggen'){
+    // Double rAF ensures screen is painted with real px before Leaflet reads dimensions
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      if(!map) initMap();
+      else map.invalidateSize();
+    }));
+  }
   if(t==='essen') drawEssen();
-  if(t==='lebensmittel') initLebensmittel();
+  if(t==='lebensmittel'&&!lbInited){initLebensmittel();lbInited=true;}
   if(t==='mehr') drawFortschritt();
 }
 
@@ -871,17 +902,24 @@ let running=false, runStart, runDist=0, lastPos=null, runTimer, coords=[];
 let effort=2, elevGain=0, elevLoss=0;
 
 function initMap(){
-  map=L.map('map',{zoomControl:false,attributionControl:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  map=L.map('map',{zoomControl:false,attributionControl:false,preferCanvas:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,
+    crossOrigin:true
+  }).addTo(map);
   L.control.attribution({prefix:'© OSM'}).addTo(map);
   routeLine=L.polyline([],{color:'#007AFF',weight:5,opacity:.9}).addTo(map);
+  // Set a default view immediately so tiles start loading
+  map.setView([52.52,13.405],13);
+  // Then try to get real position
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(
-      p=>map.setView([p.coords.latitude,p.coords.longitude],16),
-      ()=>map.setView([52.52,13.405],13)
+      p=>{map.setView([p.coords.latitude,p.coords.longitude],16);},
+      ()=>{}
     );
-  } else { map.setView([52.52,13.405],13); }
-  setTimeout(()=>map.invalidateSize(),300);
+  }
+  // Force Leaflet to recalculate container size
+  requestAnimationFrame(()=>{map.invalidateSize(false);});
   drawRunHist();
 }
 function toggleRun(){running?stopRun():startRun();}
