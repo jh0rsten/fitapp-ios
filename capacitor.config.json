@@ -2,6 +2,15 @@
   "appId": "com.fitapp.justin",
   "appName": "FitApp",
   "webDir": "www",
+  "server": {
+    "allowNavigation": ["*"],
+    "androidScheme": "https"
+  },
+  "ios": {
+    "allowsLinkPreview": false,
+    "contentInset": "automatic",
+    "limitsNavigationsToAppBoundDomains": false
+  },
   "plugins": {
     "BackgroundGeolocation": {
       "locationAuthorizationRequest": "Always",
