@@ -294,11 +294,17 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
     <button class="btn-primary" onclick="savestundenplan()" style="margin-top:4px;">Speichern</button>
   </div>
   <div id="mehr-set" style="display:none;">
-    <div class="sec-title">Groq API-Key (für KI-Features)</div>
-    <div class="card" style="padding:16px;">
-      <p style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;">Für KI-Funktionen (Wochenplan, Mahlzeiten-Generator) benötigst du einen kostenlosen Groq API-Key von <b>console.groq.com</b>.</p>
-      <input class="settings-input" type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off">
-      <button class="btn-primary" onclick="saveApiKey()" style="height:46px;font-size:15px;margin-top:4px;">Speichern</button>
+    <div class="sec-title">Claude API-Key</div>
+    <div class="card" style="padding:16px;margin-bottom:12px;">
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;">Kostenloser Key von <b>console.anthropic.com</b> → API Keys → Create Key. Fängt mit <b>sk-ant-</b> an.</p>
+      <input class="settings-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" style="margin-bottom:10px;">
+      <button class="btn-primary" onclick="saveApiKey()" style="height:46px;font-size:15px;">Speichern</button>
+      <div id="api-save-status" style="font-size:14px;font-weight:600;text-align:center;margin-top:8px;min-height:20px;"></div>
+    </div>
+    <div class="sec-title">Meine Joggen-Tage</div>
+    <div class="card" style="padding:14px 16px;">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Die KI berücksichtigt diese Tage beim Generieren von Trainings- und Mahlzeitenplänen.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="jog-days-picker"></div>
     </div>
   </div>
 </div>
@@ -1669,7 +1675,7 @@ function openTagesplan(){
 
 async function generateTagesplan(){
   const apiKey=localStorage.getItem('fp_apikey');
-  if(!apiKey){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
+  if(!apiKey){alert('Bitte zuerst Claude API-Key unter Mehr → API eintragen.');return;}
 
   const appDow=jsDayToApp(new Date().getDay());
   const sched=getTodaySchedule();
@@ -1755,12 +1761,13 @@ Sei konkret mit Mengenangaben. Keine Floskeln oder Einleitungen.`
       .replace(/\n\n/g,'</p><p style="margin-top:12px;">')
       .replace(/\n/g,'<br>');
     resultEl.innerHTML=`<div style="font-size:13px;line-height:1.85;background:var(--bg);border-radius:12px;padding:14px;"><p>${html}</p></div>`;
+    showGenBadge('tp-result');
   } else { resultEl.innerHTML=''; }
 }
 
 async function generateWeekPlan(){
   const key=localStorage.getItem('fp_apikey');
-  if(!key){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
+  if(!key){alert('Bitte zuerst Claude API-Key unter Mehr → API eintragen.');return;}
   const sched=getSchedule();
   const weight=document.getElementById('pl-weight').value||'70';
   const height=document.getElementById('pl-height').value||'175';
@@ -1779,16 +1786,21 @@ Protein-Ziel: 160g/Tag, ca. ${Math.round(parseFloat(weight||70)*35)} kcal/Tag.
 Stundenplan:
 ${schedSummary}
 
+${getJogDaysText()}
+
 Für jeden Tag gib an:
 - Alle Mahlzeiten mit Uhrzeit und Makros (kcal, Protein)
 - An Schultagen: Mahlzeiten in der Schulzeit als 🎒 markieren (kein Kochen)
+- An Joggen-Tagen: mehr Kohlenhydrate vor dem Lauf einplanen, Protein-Snack danach
 - Training oder Ruhetag (passend zum Wochenplan)
 - Tagesgesamt: kcal und Protein
 
 Praktisch, echte Lebensmittel, Deutschland.`;
   const result=await callClaude(prompt,'Du bist ein erfahrener Fitness- und Ernährungsberater. Antworte auf Deutsch. Konkret und praktisch.');
-  if(result) resultEl.innerHTML=`<div class="ai-result">${result.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
-  else resultEl.innerHTML='';
+  if(result){
+    resultEl.innerHTML=`<div class="ai-result">${result.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
+    showGenBadge('plan-result');
+  } else { resultEl.innerHTML=''; }
 }
 
 function calcBMI(){
@@ -1835,7 +1847,7 @@ function openMealGen(){openTagesplan();}
 // ─── KI TRAININGSPLAN GENERATOR ───────────────────────────────────────────────
 async function generateTrainPlan(){
   const key=localStorage.getItem('fp_apikey');
-  if(!key){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
+  if(!key){alert('Bitte zuerst Claude API-Key unter Mehr → API eintragen.');return;}
   const resultEl=document.getElementById('train-plan-result');
   resultEl.innerHTML='<div class="ai-loading">⏳ Analysiere deine Stats…</div>';
   // Collect last exercise data from plan + logs
@@ -1865,20 +1877,56 @@ ${recentActivity||'Noch keine Einträge'}
 
 Profil: ${age} Jahre, ${weight}kg, Ziel: Muskelaufbau, trainiere zuhause mit Kurz- und Langhanteln.
 
+${getJogDaysText()}
+
 Prinzipien:
 - Progressive Overload: wo möglich +1–2.5kg gegenüber aktuellen Gewichten
 - Ausreichend Erholung zwischen gleichen Muskelgruppen (min. 48h)
-- Kombiniere Joggen-Tage mit Ruhe oder leichten Einheiten
+- An Joggen-Tagen: kein schweres Beintraining, Core oder Oberkörper bevorzugen
 - Gib für jede Übung konkretes Gewicht, Sets und Reps an
 
 Format: Tag → Trainingstyp → Übungen mit Gewicht`;
   const result=await callClaude(prompt,'Du bist ein erfahrener Krafttrainer. Antworte auf Deutsch. Sei konkret mit Gewichten. Keine Floskeln.');
   if(result){
     resultEl.innerHTML=`<div class="ai-result" style="margin-top:4px;">${result.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
+    showGenBadge('train-plan-result');
   } else { resultEl.innerHTML=''; }
 }
 
-// ─── MEHR (Fortschritt + Lexikon + Settings) ──────────────────────────────────
+// ─── JOGGEN-TAGE ──────────────────────────────────────────────────────────────
+function getJogDays(){
+  return JSON.parse(localStorage.getItem('fp_jogdays')||'[1,3,5]');
+}
+function saveJogDays(days){
+  localStorage.setItem('fp_jogdays',JSON.stringify(days));
+}
+function drawJogDaysPicker(){
+  const el=document.getElementById('jog-days-picker');
+  if(!el) return;
+  const saved=getJogDays();
+  el.innerHTML=DAYS_LONG.map((d,i)=>`
+    <button onclick="togJogDay(${i})" id="jd-${i}" style="padding:8px 16px;border-radius:99px;font-size:14px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;transition:all .15s;background:${saved.includes(i)?'var(--accent)':'var(--bg)'};color:${saved.includes(i)?'#fff':'var(--text2)'};">${d}</button>
+  `).join('');
+}
+function togJogDay(i){
+  let days=getJogDays();
+  if(days.includes(i)) days=days.filter(d=>d!==i);
+  else days.push(i);
+  saveJogDays(days);
+  drawJogDaysPicker();
+}
+function getJogDaysText(){
+  const days=getJogDays();
+  if(!days.length) return 'Keine Joggen-Tage festgelegt.';
+  return 'Joggen-Tage: '+days.map(i=>DAYS_LONG[i]).join(', ')+'.';
+}
+
+// ─── GENERIERT BADGE ──────────────────────────────────────────────────────────
+function showGenBadge(elId){
+  const el=document.getElementById(elId);
+  if(!el) return;
+  el.innerHTML=`<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,199,89,0.12);color:var(--green);font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;margin-bottom:10px;">✓ Generiert</div>`+el.innerHTML;
+}
 let mehrCurrentTab='fort';
 function mehrTab(t){
   mehrCurrentTab=t;
@@ -1891,14 +1939,18 @@ function mehrTab(t){
   if(t==='stp') drawStundenplan();
   if(t==='set'){
     const k=localStorage.getItem('fp_apikey')||'';
-    document.getElementById('api-key-input').value=k?'gsk_***gespeichert***':'';
+    document.getElementById('api-key-input').value=k?'sk-ant-***gespeichert***':'';
+    drawJogDaysPicker();
   }
 }
 function saveApiKey(){
   const v=document.getElementById('api-key-input').value.trim();
-  if(!v.startsWith('gsk_')&&v!==''){alert('Ungültiger Groq API-Key. Er muss mit gsk_ beginnen.');return;}
+  if(!v.startsWith('sk-ant-')&&v!==''){alert('Ungültiger API-Key. Er muss mit sk-ant- beginnen.');return;}
   localStorage.setItem('fp_apikey',v);
-  alert(v?'✓ Groq API-Key gespeichert!':'API-Key gelöscht.');
+  const el=document.getElementById('api-save-status');
+  el.textContent=v?'✓ Gespeichert!':'Key gelöscht.';
+  el.style.color=v?'var(--green)':'var(--text2)';
+  setTimeout(()=>el.textContent='',2500);
 }
 
 function drawFortschritt(){
@@ -1910,7 +1962,8 @@ function drawFortschritt(){
   for(let i=0;i<7;i++){
     const d=new Date(); d.setDate(d.getDate()-i);
     const key=d.toISOString().slice(0,10);
-    const meals=isSchool(jsDayToApp(d.getDay()))?SCHOOL_MEALS:FREE_MEALS;
+    const daySchedule=getSchedule()[jsDayToApp(d.getDay())];
+    const meals=daySchedule&&daySchedule.school?SCHOOL_MEALS:FREE_MEALS;
     const log=mealLogs[key]||{};
     mTotal+=meals.length; mDone+=Object.values(log).filter(Boolean).length;
   }
@@ -1969,30 +2022,30 @@ function drawLexikon(){
 }
 function togLex(i){document.getElementById('lx'+i).classList.toggle('open');}
 
-// ─── GROQ API ─────────────────────────────────────────────────────────────────
+// ─── CLAUDE API ───────────────────────────────────────────────────────────────
 async function callClaude(prompt, system=''){
   const key=localStorage.getItem('fp_apikey');
   if(!key) return null;
   try{
-    const messages=[];
-    if(system) messages.push({role:'system',content:system});
-    messages.push({role:'user',content:prompt});
     const body={
-      model:'llama-3.3-70b-versatile',
+      model:'claude-sonnet-4-20250514',
       max_tokens:1500,
-      messages
+      messages:[{role:'user',content:prompt}],
+      ...(system?{system}:{})
     };
-    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer '+key
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
       },
       body:JSON.stringify(body)
     });
     const data=await r.json();
     if(data.error) throw new Error(data.error.message);
-    return data.choices[0].message.content;
+    return data.content.map(c=>c.text||'').join('');
   }catch(e){
     alert('Fehler beim KI-Aufruf: '+e.message); return null;
   }
