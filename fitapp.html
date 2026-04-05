@@ -18,8 +18,8 @@
   :root{--bg:#1C1C1E;--card:#2C2C2E;--text:#fff;--border:rgba(255,255,255,0.1);}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);}
-.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-top:calc(env(safe-area-inset-top,44px)+16px);}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none;}
+.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px;padding-top:calc(env(safe-area-inset-top,44px)+16px);overscroll-behavior-y:contain;}
 .screen.active{display:block;}
 h1{font-size:28px;font-weight:700;margin-bottom:16px;letter-spacing:-0.5px;}
 h2{font-size:17px;font-weight:600;margin-bottom:10px;}
@@ -28,11 +28,11 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 .card-row:last-child{border-bottom:none;}
 .sec-title{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin:16px 4px 6px;}
 /* Nav */
-.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(249,249,249,.94);border-top:.5px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;}
+.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(249,249,249,.94);border-top:.5px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:1000;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
 @media(prefers-color-scheme:dark){.nav{background:rgba(28,28,30,.94);}}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;font-size:9px;color:var(--text2);padding:4px 2px 0;cursor:pointer;transition:color .15s;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;font-size:9px;color:var(--text2);padding:4px 2px 0;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;min-height:44px;}
 .nav-btn.active{color:var(--accent);}
-.nav-icon{font-size:20px;line-height:1;margin-bottom:1px;}
+.nav-icon{font-size:20px;line-height:1;margin-bottom:1px;pointer-events:none;}
 /* Badges */
 .badge{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:600;}
 .b-blue{background:#E1EDFF;color:#0040B0;}.b-green{background:#E1F5E7;color:#1A7A35;}
@@ -294,10 +294,10 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
     <button class="btn-primary" onclick="savestundenplan()" style="margin-top:4px;">Speichern</button>
   </div>
   <div id="mehr-set" style="display:none;">
-    <div class="sec-title">Claude API-Key (für KI-Features)</div>
+    <div class="sec-title">Groq API-Key (für KI-Features)</div>
     <div class="card" style="padding:16px;">
-      <p style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;">Für KI-Funktionen (Wochenplan, Mahlzeiten-Generator) benötigst du einen kostenlosen Claude API-Key von <b>console.anthropic.com</b>.</p>
-      <input class="settings-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+      <p style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;">Für KI-Funktionen (Wochenplan, Mahlzeiten-Generator) benötigst du einen kostenlosen Groq API-Key von <b>console.groq.com</b>.</p>
+      <input class="settings-input" type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off">
       <button class="btn-primary" onclick="saveApiKey()" style="height:46px;font-size:15px;margin-top:4px;">Speichern</button>
     </div>
   </div>
@@ -1669,7 +1669,7 @@ function openTagesplan(){
 
 async function generateTagesplan(){
   const apiKey=localStorage.getItem('fp_apikey');
-  if(!apiKey){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
+  if(!apiKey){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
 
   const appDow=jsDayToApp(new Date().getDay());
   const sched=getTodaySchedule();
@@ -1760,7 +1760,7 @@ Sei konkret mit Mengenangaben. Keine Floskeln oder Einleitungen.`
 
 async function generateWeekPlan(){
   const key=localStorage.getItem('fp_apikey');
-  if(!key){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
+  if(!key){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
   const sched=getSchedule();
   const weight=document.getElementById('pl-weight').value||'70';
   const height=document.getElementById('pl-height').value||'175';
@@ -1835,7 +1835,7 @@ function openMealGen(){openTagesplan();}
 // ─── KI TRAININGSPLAN GENERATOR ───────────────────────────────────────────────
 async function generateTrainPlan(){
   const key=localStorage.getItem('fp_apikey');
-  if(!key){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
+  if(!key){alert('Bitte zuerst Groq API-Key unter Mehr → API eintragen.');return;}
   const resultEl=document.getElementById('train-plan-result');
   resultEl.innerHTML='<div class="ai-loading">⏳ Analysiere deine Stats…</div>';
   // Collect last exercise data from plan + logs
@@ -1891,14 +1891,14 @@ function mehrTab(t){
   if(t==='stp') drawStundenplan();
   if(t==='set'){
     const k=localStorage.getItem('fp_apikey')||'';
-    document.getElementById('api-key-input').value=k?'sk-ant-***gespeichert***':'';
+    document.getElementById('api-key-input').value=k?'gsk_***gespeichert***':'';
   }
 }
 function saveApiKey(){
   const v=document.getElementById('api-key-input').value.trim();
-  if(!v.startsWith('sk-ant-')&&v!==''){alert('Ungültiger API-Key. Er muss mit sk-ant- beginnen.');return;}
+  if(!v.startsWith('gsk_')&&v!==''){alert('Ungültiger Groq API-Key. Er muss mit gsk_ beginnen.');return;}
   localStorage.setItem('fp_apikey',v);
-  alert(v?'✓ API-Key gespeichert!':'API-Key gelöscht.');
+  alert(v?'✓ Groq API-Key gespeichert!':'API-Key gelöscht.');
 }
 
 function drawFortschritt(){
@@ -1969,30 +1969,30 @@ function drawLexikon(){
 }
 function togLex(i){document.getElementById('lx'+i).classList.toggle('open');}
 
-// ─── CLAUDE API ───────────────────────────────────────────────────────────────
+// ─── GROQ API ─────────────────────────────────────────────────────────────────
 async function callClaude(prompt, system=''){
   const key=localStorage.getItem('fp_apikey');
   if(!key) return null;
   try{
+    const messages=[];
+    if(system) messages.push({role:'system',content:system});
+    messages.push({role:'user',content:prompt});
     const body={
-      model:'claude-sonnet-4-20250514',
+      model:'llama-3.3-70b-versatile',
       max_tokens:1500,
-      messages:[{role:'user',content:prompt}],
-      ...(system?{system}:{})
+      messages
     };
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':key,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
+        'Authorization':'Bearer '+key
       },
       body:JSON.stringify(body)
     });
     const data=await r.json();
     if(data.error) throw new Error(data.error.message);
-    return data.content.map(c=>c.text||'').join('');
+    return data.choices[0].message.content;
   }catch(e){
     alert('Fehler beim KI-Aufruf: '+e.message); return null;
   }
