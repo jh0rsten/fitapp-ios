@@ -2,9 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="FitApp">
 <title>FitApp</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -12,28 +12,14 @@
 :root {
   --bg:#F2F2F7;--card:#fff;--text:#000;--text2:#8E8E93;
   --border:rgba(60,60,67,0.15);--accent:#007AFF;--green:#34C759;
-  --orange:#FF9500;--red:#FF3B30;
-  --sat:env(safe-area-inset-top,44px);
-  --sab:env(safe-area-inset-bottom,0px);
-  --sal:env(safe-area-inset-left,0px);
-  --sar:env(safe-area-inset-right,0px);
-  --nav-h:calc(49px + env(safe-area-inset-bottom,0px));
+  --orange:#FF9500;--red:#FF3B30;--nav-h:83px;
 }
 @media(prefers-color-scheme:dark){
   :root{--bg:#1C1C1E;--card:#2C2C2E;--text:#fff;--border:rgba(255,255,255,0.1);}
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);}
-.screen{
-  display:none;position:absolute;
-  top:0;left:0;right:0;
-  bottom:var(--nav-h);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px;
-  padding-top:calc(var(--sat) + 16px);
-  padding-left:calc(var(--sal) + 16px);
-  padding-right:calc(var(--sar) + 16px);
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);}
+.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-top:calc(env(safe-area-inset-top,44px)+16px);}
 .screen.active{display:block;}
 h1{font-size:28px;font-weight:700;margin-bottom:16px;letter-spacing:-0.5px;}
 h2{font-size:17px;font-weight:600;margin-bottom:10px;}
@@ -42,18 +28,7 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 .card-row:last-child{border-bottom:none;}
 .sec-title{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin:16px 4px 6px;}
 /* Nav */
-.nav{
-  position:fixed;bottom:0;left:0;right:0;
-  height:var(--nav-h);
-  background:rgba(249,249,249,.94);
-  border-top:.5px solid var(--border);
-  display:flex;
-  align-items:flex-start;
-  padding-top:4px;
-  padding-bottom:var(--sab);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  z-index:100;
-}
+.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(249,249,249,.94);border-top:.5px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;}
 @media(prefers-color-scheme:dark){.nav{background:rgba(28,28,30,.94);}}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;font-size:9px;color:var(--text2);padding:4px 2px 0;cursor:pointer;transition:color .15s;}
 .nav-btn.active{color:var(--accent);}
@@ -73,6 +48,20 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 .btn-edit{font-size:13px;padding:5px 13px;border-radius:8px;background:rgba(0,122,255,.1);color:var(--accent);border:none;cursor:pointer;font-weight:500;flex-shrink:0;}
 .btn-sm{font-size:13px;padding:7px 14px;border-radius:9px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600;flex-shrink:0;}
 .btn-sm-ghost{font-size:13px;padding:7px 14px;border-radius:9px;background:rgba(142,142,147,.15);color:var(--text2);border:none;cursor:pointer;font-weight:500;flex-shrink:0;}
+/* Activity / Goal selector buttons */
+.act-btn,.goal-btn{font-size:13px;padding:8px 13px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;font-weight:500;transition:all .15s;}
+.act-btn.on,.goal-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+/* Macro ring cards */
+.macro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.macro-card{background:var(--card);border-radius:16px;padding:16px 14px;text-align:center;}
+.macro-main{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.macro-unit{font-size:14px;font-weight:500;color:var(--text2);margin-top:2px;}
+.macro-lbl{font-size:11px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.macro-bar-bg{height:5px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:8px;}
+.macro-bar{height:100%;border-radius:99px;}
+.kcal-banner{background:var(--card);border-radius:16px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.kcal-num{font-size:42px;font-weight:800;letter-spacing:-2px;color:var(--orange);}
+.kcal-sub{font-size:13px;color:var(--text2);line-height:1.5;}
 /* Segment control */
 .seg-ctrl{display:flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px;margin-bottom:16px;gap:2px;}
 .seg-btn{flex:1;padding:7px;border-radius:8px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:none;color:var(--text2);transition:all .18s;}
@@ -156,30 +145,43 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 <!-- ── TRAINING ── -->
 <div class="screen active" id="screen-training">
   <h1>Training</h1>
-  <div class="day-tabs" id="train-tabs"></div>
-  <div id="train-body"></div>
-  <div class="sec-title">KI Trainingsplan</div>
-  <button class="btn-primary" onclick="generateTrainPlan()" style="margin-bottom:8px;">🤖 Plan basierend auf meinen Stats generieren</button>
-  <div id="train-plan-result"></div>
+  <div class="seg-ctrl" style="margin-bottom:12px;">
+    <button class="seg-btn on" id="tr-btn-plan" onclick="trTab('plan')">📋 Plan</button>
+    <button class="seg-btn" id="tr-btn-kalender" onclick="trTab('kalender')">📅 Kalender</button>
+  </div>
+  <div id="tr-plan">
+    <div class="day-tabs" id="train-tabs"></div>
+    <div id="train-body"></div>
+    <div class="sec-title">KI Trainingsplan</div>
+    <button class="btn-primary" onclick="generateTrainPlan()" style="margin-bottom:8px;">🤖 Plan basierend auf meinen Stats generieren</button>
+    <div id="train-plan-result"></div>
+  </div>
+  <div id="tr-kalender" style="display:none;">
+    <div id="kal-nav" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <button onclick="kalPrevMonth()" style="background:none;border:none;font-size:22px;cursor:pointer;padding:4px 8px;">‹</button>
+      <div id="kal-month-label" style="font-size:17px;font-weight:600;"></div>
+      <button onclick="kalNextMonth()" style="background:none;border:none;font-size:22px;cursor:pointer;padding:4px 8px;">›</button>
+    </div>
+    <div id="kal-grid"></div>
+    <div id="kal-detail" style="margin-top:14px;"></div>
+  </div>
 </div>
 
 <!-- ── ESSEN ── -->
 <div class="screen" id="screen-essen">
   <h1>Essen</h1>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-    <div id="essen-day" style="font-size:15px;color:var(--text2);font-weight:500;"></div>
-    <button id="schulwoche-toggle" onclick="toggleSchulwoche()" style="font-size:13px;padding:6px 12px;border-radius:99px;border:none;cursor:pointer;font-weight:600;">📚 Schulwoche</button>
-  </div>
+  <div id="essen-day-info" style="margin-bottom:14px;"></div>
   <div id="essen-body"></div>
   <div style="display:flex;gap:8px;margin-top:8px;">
-    <button class="btn-primary" onclick="openMealGen()" style="flex:1;">🎲 KI generieren</button>
-    <button onclick="resetMeals()" style="padding:0 14px;height:52px;border-radius:13px;background:var(--bg);color:var(--text2);border:1.5px solid var(--border);font-size:13px;cursor:pointer;font-weight:500;">↺ Reset</button>
+    <button class="btn-primary" onclick="openTagesplan()" style="flex:1;">🍽️ Tagesplan generieren</button>
+    <button onclick="resetMeals()" style="padding:0 14px;height:52px;border-radius:13px;background:var(--bg);color:var(--text2);border:1.5px solid var(--border);font-size:13px;cursor:pointer;font-weight:500;">↺</button>
   </div>
 </div>
 
 <!-- ── JOGGEN ── -->
 <div class="screen" id="screen-joggen">
   <h1>Joggen</h1>
+  <div id="gps-status" style="display:none;font-size:13px;font-weight:600;color:var(--accent);background:rgba(0,122,255,.1);border-radius:8px;padding:7px 12px;margin-bottom:10px;text-align:center;"></div>
   <div id="map"></div>
   <div class="run-stats">
     <div class="stat-box"><div class="stat-num" id="r-km">0.00</div><div class="stat-lbl">km</div></div>
@@ -215,34 +217,51 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
 <div class="screen" id="screen-planer">
   <h1>Planer</h1>
   <div class="seg-ctrl">
-    <button class="seg-btn on" id="pl-btn-woche" onclick="plTab('woche')">📅 Wochenplan</button>
+    <button class="seg-btn on" id="pl-btn-makros" onclick="plTab('makros')">🔥 Makros</button>
+    <button class="seg-btn" id="pl-btn-woche" onclick="plTab('woche')">📅 Wochenplan</button>
     <button class="seg-btn" id="pl-btn-bmi" onclick="plTab('bmi')">⚖️ BMI</button>
   </div>
 
+  <!-- MAKROS -->
+  <div id="pl-makros">
+    <div class="sec-title">Dein Profil</div>
+    <div class="card">
+      <div class="card-row"><div style="flex:1;font-size:15px;">Alter</div><input class="row-input" type="number" id="mk-age" value="16" inputmode="numeric" oninput="calcMakros()"><span style="color:var(--text2);font-size:14px;">J</span></div>
+      <div class="card-row"><div style="flex:1;font-size:15px;">Gewicht</div><input class="row-input" type="number" id="mk-weight" placeholder="70" inputmode="decimal" oninput="calcMakros()"><span style="color:var(--text2);font-size:14px;">kg</span></div>
+      <div class="card-row" style="border-bottom:none;"><div style="flex:1;font-size:15px;">Größe</div><input class="row-input" type="number" id="mk-height" placeholder="175" inputmode="numeric" oninput="calcMakros()"><span style="color:var(--text2);font-size:14px;">cm</span></div>
+    </div>
+    <div class="sec-title">Aktivitätslevel</div>
+    <div class="card">
+      <div class="card-row" style="flex-wrap:wrap;gap:6px;border-bottom:none;padding:12px;">
+        <button class="act-btn" data-v="1.2" onclick="setActivity(this,1.2)">🛋 Kaum aktiv</button>
+        <button class="act-btn" data-v="1.375" onclick="setActivity(this,1.375)">🚶 1–3× / Woche</button>
+        <button class="act-btn on" data-v="1.55" onclick="setActivity(this,1.55)">💪 3–5× / Woche</button>
+        <button class="act-btn" data-v="1.725" onclick="setActivity(this,1.725)">🔥 6–7× / Woche</button>
+      </div>
+    </div>
+    <div class="sec-title">Ziel</div>
+    <div class="card">
+      <div class="card-row" style="flex-wrap:wrap;gap:6px;border-bottom:none;padding:12px;">
+        <button class="goal-btn" data-v="-300" onclick="setGoal(this,-300)">📉 Abnehmen</button>
+        <button class="goal-btn on" data-v="250" onclick="setGoal(this,250)">💪 Muskelaufbau</button>
+        <button class="goal-btn" data-v="0" onclick="setGoal(this,0)">⚖️ Halten</button>
+      </div>
+    </div>
+    <div id="makros-result" style="margin-top:4px;"></div>
+  </div>
+
   <!-- Wochenplan -->
-  <div id="pl-woche">
+  <div id="pl-woche" style="display:none;">
     <div class="sec-title">Profil</div>
     <div class="card">
       <div class="card-row"><div style="flex:1;font-size:15px;">Alter</div><input class="row-input" type="number" id="pl-age" value="16" inputmode="numeric"><span style="color:var(--text2);font-size:14px;">J</span></div>
       <div class="card-row"><div style="flex:1;font-size:15px;">Gewicht</div><input class="row-input" type="number" id="pl-weight" placeholder="70" inputmode="decimal"><span style="color:var(--text2);font-size:14px;">kg</span></div>
       <div class="card-row" style="border-bottom:none;"><div style="flex:1;font-size:15px;">Größe</div><input class="row-input" type="number" id="pl-height" placeholder="175" inputmode="numeric"><span style="color:var(--text2);font-size:14px;">cm</span></div>
     </div>
-    <div class="sec-title">Schultage</div>
-    <div class="card">
-      <div class="card-row" style="flex-wrap:wrap;gap:10px;border-bottom:none;">
-        <label style="display:flex;align-items:center;gap:5px;font-size:14px;"><input type="checkbox" class="school-day-cb" value="Montag" checked> Mo</label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:14px;"><input type="checkbox" class="school-day-cb" value="Dienstag" checked> Di</label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:14px;"><input type="checkbox" class="school-day-cb" value="Mittwoch" checked> Mi</label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:14px;"><input type="checkbox" class="school-day-cb" value="Donnerstag" checked> Do</label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:14px;"><input type="checkbox" class="school-day-cb" value="Freitag" checked> Fr</label>
-      </div>
+    <div style="background:rgba(0,122,255,.07);border-radius:12px;padding:11px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;">
+      📅 Schulzeiten kommen aus deinem <button onclick="mehrTab('stp');goTab('mehr')" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:0;">Stundenplan</button>
     </div>
-    <div class="sec-title">Schulzeiten</div>
-    <div class="card">
-      <div class="card-row"><div style="flex:1;font-size:15px;">Schulbeginn</div><input type="time" id="school-start" value="07:35" style="border:none;background:none;font-size:15px;font-weight:600;color:var(--accent);outline:none;"></div>
-      <div class="card-row" style="border-bottom:none;"><div style="flex:1;font-size:15px;">Schulende</div><input type="time" id="school-end" value="12:45" style="border:none;background:none;font-size:15px;font-weight:600;color:var(--accent);outline:none;"></div>
-    </div>
-    <button class="btn-primary" onclick="generateWeekPlan()" style="margin:8px 0 16px;">✨ KI-Wochenplan generieren</button>
+    <button class="btn-primary" onclick="generateWeekPlan()" style="margin:0 0 16px;">✨ KI-Wochenplan generieren</button>
     <div id="plan-result"></div>
   </div>
 
@@ -264,10 +283,16 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
   <div class="seg-ctrl">
     <button class="seg-btn on" id="mehr-btn-fort" onclick="mehrTab('fort')">📈 Fortschritt</button>
     <button class="seg-btn" id="mehr-btn-lex" onclick="mehrTab('lex')">📖 Lexikon</button>
+    <button class="seg-btn" id="mehr-btn-stp" onclick="mehrTab('stp')">🗓 Stundenplan</button>
     <button class="seg-btn" id="mehr-btn-set" onclick="mehrTab('set')">⚙️ API</button>
   </div>
   <div id="mehr-fort"><div id="prog-body"></div></div>
   <div id="mehr-lex" style="display:none;"><div class="card" id="lex-body"></div></div>
+  <div id="mehr-stp" style="display:none;">
+    <p style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px;">Trag für jeden Tag ein ob du Schule hast und von wann bis wann. Mahlzeiten während der Schulzeit werden als 🎒 markiert (nicht kochbar).</p>
+    <div id="stundenplan-body"></div>
+    <button class="btn-primary" onclick="savestundenplan()" style="margin-top:4px;">Speichern</button>
+  </div>
   <div id="mehr-set" style="display:none;">
     <div class="sec-title">Claude API-Key (für KI-Features)</div>
     <div class="card" style="padding:16px;">
@@ -332,6 +357,36 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
   </div>
 </div>
 
+<!-- Training exercise edit/add -->
+<div class="modal-bg" id="m-ex-edit">
+  <div class="modal">
+    <h3 id="m-ex-edit-title">Übung bearbeiten</h3>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Name</div>
+    <input type="text" id="m-ex-name" placeholder="z.B. Kurzhantel Curls" style="width:100%;padding:12px;font-size:15px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;margin-bottom:12px;">
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Sätze</div>
+        <input type="number" id="m-ex-sets" value="3" inputmode="numeric" style="width:100%;padding:12px;font-size:15px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);outline:none;">
+      </div>
+      <div style="flex:1.5;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Wdh / Dauer</div>
+        <input type="text" id="m-ex-reps" placeholder="10 oder 30 Sek" style="width:100%;padding:12px;font-size:15px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;">
+        <input type="checkbox" id="m-ex-hw" style="width:18px;height:18px;cursor:pointer;">
+        Mit Gewicht
+      </label>
+      <input type="number" id="m-ex-weight" placeholder="kg" inputmode="decimal" step="0.5" style="width:80px;padding:10px;font-size:15px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);outline:none;">
+    </div>
+    <div class="modal-row">
+      <button class="btn-primary" onclick="saveExEdit()" style="font-size:16px;height:46px;">Speichern</button>
+      <button class="btn-ghost" onclick="document.getElementById('m-ex-edit').classList.remove('open')" style="font-size:16px;height:46px;flex:.6;">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <!-- Meal edit/add -->
 <div class="modal-bg" id="m-meal-edit">
   <div class="modal">
@@ -355,25 +410,38 @@ h2{font-size:17px;font-weight:600;margin-bottom:10px;}
   </div>
 </div>
 
-
-<!-- Meal generator -->
-<div class="modal-bg" id="m-meal">
+<!-- Tagesplan generator -->
+<div class="modal-bg" id="m-tagesplan">
   <div class="modal">
-    <h3>🎲 Mahlzeiten-Generator</h3>
-    <div class="seg-ctrl" style="margin-bottom:14px;">
-      <button class="seg-btn on" id="mg-btn-1" onclick="mgType('Frühstück')">Frühstück</button>
-      <button class="seg-btn" id="mg-btn-2" onclick="mgType('Mittagessen')">Mittag</button>
-      <button class="seg-btn" id="mg-btn-3" onclick="mgType('Abendessen')">Abend</button>
-      <button class="seg-btn" id="mg-btn-4" onclick="mgType('Snack')">Snack</button>
+    <h3>🍽️ Tagesplan für heute</h3>
+
+    <!-- Auto-filled profile summary -->
+    <div id="tp-profile-info" style="background:rgba(0,122,255,.08);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;"></div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-row">
+        <div style="flex:1;font-size:15px;">Heute Kraft-Training?</div>
+        <div style="display:flex;gap:6px;">
+          <button id="tp-train-ja"  onclick="setTpTrain(true)"  style="font-size:13px;padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--accent);color:#fff;cursor:pointer;font-weight:600;">Ja 💪</button>
+          <button id="tp-train-nei" onclick="setTpTrain(false)" style="font-size:13px;padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;font-weight:500;">Nein</button>
+        </div>
+      </div>
+      <div class="card-row">
+        <div style="flex:1;font-size:15px;">Heute Joggen?</div>
+        <div style="display:flex;gap:6px;">
+          <button id="tp-jog-ja"  onclick="setTpJog(true)"  style="font-size:13px;padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;font-weight:500;">Ja 🏃</button>
+          <button id="tp-jog-nei" onclick="setTpJog(false)" style="font-size:13px;padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--accent);color:#fff;cursor:pointer;font-weight:600;">Nein</button>
+        </div>
+      </div>
+      <div id="tp-jog-time-row" class="card-row" style="display:none;border-bottom:none;">
+        <div style="flex:1;font-size:14px;color:var(--text2);">Jogging-Uhrzeit</div>
+        <input type="time" id="tp-jog-hour" value="19:00" style="border:1.5px solid var(--border);border-radius:9px;padding:7px 11px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+      </div>
     </div>
-    <div class="card-row" style="border-radius:13px;border:.5px solid var(--border);margin-bottom:14px;border-bottom:.5px solid var(--border);">
-      <div style="font-size:14px;flex:1;">Ziel-Kalorien</div>
-      <input type="number" id="mg-kcal" value="500" inputmode="numeric" style="border:none;background:none;font-size:15px;font-weight:600;color:var(--accent);text-align:right;width:70px;outline:none;">
-      <span style="color:var(--text2);font-size:13px;">kcal</span>
-    </div>
-    <button class="btn-primary" onclick="generateMeal()" style="margin-bottom:14px;">✨ Generieren</button>
-    <div id="mg-result"></div>
-    <button class="btn-ghost" onclick="closeMealGen()" style="margin-top:10px;width:100%;">Schließen</button>
+
+    <button class="btn-primary" onclick="generateTagesplan()" style="margin-bottom:12px;">✨ Tagesplan generieren</button>
+    <div id="tp-result"></div>
+    <button class="btn-ghost" onclick="closeTagesplan()" style="margin-top:8px;width:100%;">Schließen</button>
   </div>
 </div>
 
@@ -705,7 +773,7 @@ function persist(){
 function todayKey(){return new Date().toISOString().slice(0,10);}
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-let curTab='training', lbInited=false;
+let curTab='training';
 function goTab(t){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -713,15 +781,141 @@ function goTab(t){
   document.getElementById('nav-'+t).classList.add('active');
   curTab=t;
   if(t==='joggen'){
-    // Double rAF ensures screen is painted with real px before Leaflet reads dimensions
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      if(!map) initMap();
-      else map.invalidateSize();
+      if(!map) initMap(); else { map.invalidateSize(); }
     }));
   }
   if(t==='essen') drawEssen();
-  if(t==='lebensmittel'&&!lbInited){initLebensmittel();lbInited=true;}
+  if(t==='lebensmittel') initLebensmittel();
   if(t==='mehr') drawFortschritt();
+  if(t==='planer') { plTab('makros'); }
+}
+
+// ─── TRAINING TABS ────────────────────────────────────────────────────────────
+function trTab(t){
+  document.getElementById('tr-plan').style.display=t==='plan'?'':'none';
+  document.getElementById('tr-kalender').style.display=t==='kalender'?'':'none';
+  document.getElementById('tr-btn-plan').classList.toggle('on',t==='plan');
+  document.getElementById('tr-btn-kalender').classList.toggle('on',t==='kalender');
+  if(t==='kalender') drawKalender();
+}
+
+// ─── KALENDER ─────────────────────────────────────────────────────────────────
+let kalYear=new Date().getFullYear(), kalMonth=new Date().getMonth();
+function kalPrevMonth(){kalMonth--;if(kalMonth<0){kalMonth=11;kalYear--;}drawKalender();}
+function kalNextMonth(){kalMonth++;if(kalMonth>11){kalMonth=0;kalYear++;}drawKalender();}
+
+function drawKalender(){
+  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  document.getElementById('kal-month-label').textContent=monthNames[kalMonth]+' '+kalYear;
+
+  const firstDay=new Date(kalYear,kalMonth,1);
+  // Start week on Monday: JS 0=Sun → offset
+  const startOffset=(firstDay.getDay()+6)%7;
+  const daysInMonth=new Date(kalYear,kalMonth+1,0).getDate();
+  const today=new Date();
+
+  let g='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">';
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d=>{
+    g+=`<div style="text-align:center;font-size:11px;font-weight:600;color:var(--text2);padding:4px 0;">${d}</div>`;
+  });
+  // empty cells before month start
+  for(let i=0;i<startOffset;i++) g+=`<div></div>`;
+
+  for(let day=1;day<=daysInMonth;day++){
+    const date=new Date(kalYear,kalMonth,day);
+    const appDow=jsDayToApp(date.getDay());
+    const key=date.toISOString().slice(0,10);
+    const log=trainLogs[key]||{};
+    const dayPlan=plan[appDow];
+    const doneCount=Object.values(log).filter(Boolean).length;
+    const totalEx=dayPlan.exercises.length;
+    const isToday=date.toDateString()===today.toDateString();
+    const isFuture=date>today;
+
+    let bg='var(--card)', textCol='var(--text)', dot='';
+    if(!isFuture && doneCount>0){
+      const pct=doneCount/totalEx;
+      bg=pct>=1?'var(--green)':'var(--orange)';
+      textCol='#fff';
+    } else if(dayPlan.type==='pause'&&!isFuture){
+      bg='var(--bg)'; textCol='var(--text2)';
+    }
+
+    // calc weight lifted
+    const kg=calcWeightLifted(appDow,key);
+
+    g+=`<div onclick="showKalDetail('${key}',${appDow})" style="
+      background:${bg};color:${textCol};border-radius:10px;
+      padding:8px 2px;text-align:center;cursor:pointer;
+      ${isToday?'box-shadow:0 0 0 2px var(--accent);':''}
+      ${isFuture?'opacity:.4;':''}
+    ">
+      <div style="font-size:14px;font-weight:${isToday?'700':'500'};">${day}</div>
+      ${doneCount>0?`<div style="font-size:9px;margin-top:1px;">${doneCount}/${totalEx}</div>`:''}
+      ${kg>0?`<div style="font-size:9px;">⬆${kg}k</div>`:''}
+    </div>`;
+  }
+  g+='</div>';
+
+  // Legend
+  g+=`<div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:var(--green);"></div>Komplett</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:var(--orange);"></div>Teilweise</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;box-shadow:0 0 0 2px var(--accent);"></div>Heute</div>
+  </div>`;
+
+  document.getElementById('kal-grid').innerHTML=g;
+  document.getElementById('kal-detail').innerHTML='';
+}
+
+function calcWeightLifted(appDow,key){
+  const log=trainLogs[key]||{};
+  const dayPlan=plan[appDow];
+  let total=0;
+  dayPlan.exercises.forEach((ex,i)=>{
+    if(log[i]&&ex.hw&&ex.weight){
+      const reps=parseInt(ex.reps)||10;
+      total+=ex.weight*ex.sets*reps;
+    }
+  });
+  return Math.round(total/1000*10)/10; // in tonnes
+}
+
+function showKalDetail(key,appDow){
+  const log=trainLogs[key]||{};
+  const dayPlan=plan[appDow];
+  const d=new Date(key+'T12:00:00');
+  const doneCount=Object.values(log).filter(Boolean).length;
+  if(doneCount===0&&d>new Date()){
+    document.getElementById('kal-detail').innerHTML=`<div class="card" style="padding:14px 16px;">
+      <div style="font-weight:600;margin-bottom:4px;">${DAYS_LONG[appDow]}, ${d.getDate()}.${d.getMonth()+1}.</div>
+      <div style="font-size:14px;color:var(--text2);">Geplant: ${dayPlan.name}</div>
+    </div>`;
+    return;
+  }
+  if(doneCount===0){
+    document.getElementById('kal-detail').innerHTML=`<div class="card" style="padding:14px 16px;color:var(--text2);font-size:14px;">Kein Training an diesem Tag eingetragen.</div>`;
+    return;
+  }
+  const kg=calcWeightLifted(appDow,key);
+  const estMins=doneCount*4+5;
+  let h=`<div class="card"><div style="padding:14px 16px;border-bottom:.5px solid var(--border);">
+    <div style="font-weight:700;font-size:16px;">${DAYS_LONG[appDow]}, ${d.getDate()}.${d.getMonth()+1}.</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:4px;">${doneCount}/${dayPlan.exercises.length} Übungen · ~${estMins} Min · ${kg>0?'⬆ '+kg+'t gestemmt':''}</div>
+  </div>`;
+  dayPlan.exercises.forEach((ex,i)=>{
+    const done=!!log[i];
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:.5px solid var(--border);opacity:${done?1:.4};">
+      <span style="font-size:15px;">${done?'✅':'⬜'}</span>
+      <div>
+        <div style="font-size:14px;font-weight:500;">${ex.name}</div>
+        <div style="font-size:12px;color:var(--text2);">${ex.sets}×${ex.reps}${ex.hw?' · '+ex.weight+'kg':''}</div>
+      </div>
+    </div>`;
+  });
+  h+='</div>';
+  document.getElementById('kal-detail').innerHTML=h;
 }
 
 // ─── TRAINING ─────────────────────────────────────────────────────────────────
@@ -742,9 +936,13 @@ function drawTraining(){
         <div style="font-size:15px;font-weight:500;">${ex.name}</div>
         <div style="font-size:13px;color:var(--text2);">${ex.sets} × ${ex.reps}${ex.hw?' · <b>'+ex.weight+' kg</b>':''}</div>
       </div>
-      ${ex.hw?`<button class="btn-edit" onclick="openEdit(${dow},${i})">✎ kg</button>`:''}
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <button onclick="openExEdit(${dow},${i})" style="background:none;border:none;font-size:17px;cursor:pointer;padding:4px;">✎</button>
+        <button onclick="deleteEx(${dow},${i})" style="background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;padding:4px;">×</button>
+      </div>
     </div>`;
   });
+  h+=`<button onclick="openExAdd(${dow})" style="width:100%;padding:13px;background:none;border:none;color:var(--accent);font-size:15px;font-weight:600;cursor:pointer;">＋ Übung hinzufügen</button>`;
   h+='</div>';
   const done=Object.values(log).filter(Boolean).length, total=d.exercises.length;
   h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
@@ -770,24 +968,157 @@ function saveW(){
   if(!isNaN(v)&&v>0){plan[editD].exercises[editI].weight=v;persist();closeEdit();drawTraining();}
 }
 
+let editExIdx=null;
+function openExEdit(day,idx){
+  editD=day; editExIdx=idx;
+  const ex=plan[day].exercises[idx];
+  document.getElementById('m-ex-edit-title').textContent='Übung bearbeiten';
+  document.getElementById('m-ex-name').value=ex.name;
+  document.getElementById('m-ex-sets').value=ex.sets;
+  document.getElementById('m-ex-reps').value=ex.reps;
+  document.getElementById('m-ex-hw').checked=!!ex.hw;
+  document.getElementById('m-ex-weight').value=ex.weight||'';
+  document.getElementById('m-ex-edit').classList.add('open');
+  setTimeout(()=>document.getElementById('m-ex-name').focus(),200);
+}
+function openExAdd(day){
+  editD=day; editExIdx=null;
+  document.getElementById('m-ex-edit-title').textContent='Übung hinzufügen';
+  document.getElementById('m-ex-name').value='';
+  document.getElementById('m-ex-sets').value='3';
+  document.getElementById('m-ex-reps').value='10';
+  document.getElementById('m-ex-hw').checked=false;
+  document.getElementById('m-ex-weight').value='';
+  document.getElementById('m-ex-edit').classList.add('open');
+  setTimeout(()=>document.getElementById('m-ex-name').focus(),200);
+}
+function saveExEdit(){
+  const name=document.getElementById('m-ex-name').value.trim();
+  if(!name){alert('Bitte einen Namen eingeben.');return;}
+  const sets=parseInt(document.getElementById('m-ex-sets').value)||3;
+  const reps=document.getElementById('m-ex-reps').value.trim()||'10';
+  const hw=document.getElementById('m-ex-hw').checked;
+  const weight=parseFloat(document.getElementById('m-ex-weight').value)||0;
+  const ex={name,sets,reps,hw,weight:hw?weight:0};
+  if(editExIdx===null){
+    plan[editD].exercises.push(ex);
+  } else {
+    plan[editD].exercises[editExIdx]=ex;
+  }
+  persist();
+  document.getElementById('m-ex-edit').classList.remove('open');
+  drawTraining();
+}
+function deleteEx(day,idx){
+  if(!confirm('Übung löschen?')) return;
+  plan[day].exercises.splice(idx,1);
+  persist(); drawTraining();
+}
+
+// ─── STUNDENPLAN ──────────────────────────────────────────────────────────────
+const DEFAULT_SCHEDULE = [
+  {school:true,  start:'07:35', end:'12:45'}, // Mo
+  {school:true,  start:'07:35', end:'12:45'}, // Di
+  {school:true,  start:'07:35', end:'12:45'}, // Mi
+  {school:true,  start:'07:35', end:'12:45'}, // Do
+  {school:true,  start:'07:35', end:'12:45'}, // Fr
+  {school:false, start:'08:00', end:'14:00'}, // Sa
+  {school:false, start:'08:00', end:'14:00'}, // So
+];
+function getSchedule(){
+  const s=localStorage.getItem('fp_schedule');
+  return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+}
+function getTodaySchedule(){
+  return getSchedule()[jsDayToApp(new Date().getDay())];
+}
+// Returns true if a "HH:MM" time string is within school hours today
+function isDuringSchool(timeStr, sched){
+  if(!sched||!sched.school) return false;
+  return timeStr>=sched.start && timeStr<sched.end;
+}
+
+function drawStundenplan(){
+  const sched=getSchedule();
+  let h='';
+  DAYS_LONG.forEach((day,i)=>{
+    const d=sched[i];
+    h+=`<div class="card" style="margin-bottom:10px;padding:14px 16px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${d.school?'12px':'0'};">
+        <div style="font-size:15px;font-weight:600;flex:1;">${day}</div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
+          <input type="checkbox" id="stp-cb-${i}" ${d.school?'checked':''} onchange="stpToggle(${i})" style="width:18px;height:18px;">
+          Schule
+        </label>
+      </div>
+      <div id="stp-times-${i}" style="display:${d.school?'flex':'none'};gap:16px;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px;">Von</div>
+          <input type="time" id="stp-start-${i}" value="${d.start}" style="border:1.5px solid var(--border);border-radius:9px;padding:8px 10px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px;">Bis</div>
+          <input type="time" id="stp-end-${i}" value="${d.end}" style="border:1.5px solid var(--border);border-radius:9px;padding:8px 10px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('stundenplan-body').innerHTML=h;
+}
+function stpToggle(i){
+  const cb=document.getElementById('stp-cb-'+i);
+  document.getElementById('stp-times-'+i).style.display=cb.checked?'flex':'none';
+}
+function savestundenplan(){
+  const sched=getSchedule();
+  DAYS_LONG.forEach((_,i)=>{
+    sched[i].school=document.getElementById('stp-cb-'+i).checked;
+    sched[i].start=document.getElementById('stp-start-'+i).value;
+    sched[i].end=document.getElementById('stp-end-'+i).value;
+  });
+  localStorage.setItem('fp_schedule',JSON.stringify(sched));
+  alert('✓ Stundenplan gespeichert!');
+  if(curTab==='essen') drawEssen();
+}
+
 // ─── ESSEN ────────────────────────────────────────────────────────────────────
-function isSchool(appDow){return appDow>=0&&appDow<=4;} // Mo(0)–Fr(4)
 function drawEssen(){
   const appDow=jsDayToApp(new Date().getDay());
-  const schoolOverride=localStorage.getItem('fp_schulwoche');
-  const schulwoche=schoolOverride!==null?schoolOverride==='1':isSchool(appDow);
-  const meals=customMeals(schulwoche);
+  const sched=getTodaySchedule();
+  const isSchoolDay=sched.school;
+  // Use day-specific meal list key
+  const meals=customMeals(appDow);
   const key=todayKey(), log=mealLogs[key]||{};
-  document.getElementById('essen-day').textContent=DAYS_LONG[appDow]+(schulwoche?' · Schultag':' · freier Tag');
-  // Toggle button state
-  document.getElementById('schulwoche-toggle').textContent=schulwoche?'📚 Schulwoche':'🏖️ Freie Woche';
-  document.getElementById('schulwoche-toggle').style.background=schulwoche?'rgba(0,122,255,.1)':'rgba(52,199,89,.1)';
-  document.getElementById('schulwoche-toggle').style.color=schulwoche?'var(--accent)':'var(--green)';
+
+  // Header info
+  let infoHtml='';
+  if(isSchoolDay){
+    infoHtml=`<div style="display:flex;align-items:center;gap:8px;background:rgba(0,122,255,.08);border-radius:12px;padding:10px 14px;margin-bottom:14px;">
+      <span style="font-size:18px;">📚</span>
+      <div>
+        <div style="font-size:14px;font-weight:600;">${DAYS_LONG[appDow]} · Schultag</div>
+        <div style="font-size:12px;color:var(--text2);">Schule ${sched.start}–${sched.end} Uhr · 🎒 = kein Kochen möglich</div>
+      </div>
+      <button onclick="mehrTab('stp');goTab('mehr')" style="margin-left:auto;background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-weight:500;">✎ Plan</button>
+    </div>`;
+  } else {
+    infoHtml=`<div style="display:flex;align-items:center;gap:8px;background:rgba(52,199,89,.08);border-radius:12px;padding:10px 14px;margin-bottom:14px;">
+      <span style="font-size:18px;">🏖️</span>
+      <div>
+        <div style="font-size:14px;font-weight:600;">${DAYS_LONG[appDow]} · Freier Tag</div>
+        <div style="font-size:12px;color:var(--text2);">Du kannst heute alles kochen</div>
+      </div>
+      <button onclick="mehrTab('stp');goTab('mehr')" style="margin-left:auto;background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-weight:500;">✎ Plan</button>
+    </div>`;
+  }
+  document.getElementById('essen-day-info').innerHTML=infoHtml;
+
   let done=0, total=0;
   meals.forEach((_,i)=>{total++;if(log[i])done++;});
   const protDone=meals.reduce((a,m,i)=>a+(log[i]?m.prot:0),0);
   const protTotal=meals.reduce((a,m)=>a+m.prot,0);
   const pct=total?Math.round(done/total*100):0;
+
   let h=`<div class="card" style="padding:16px 16px 14px;margin-bottom:12px;">
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
       <div style="font-size:13px;color:var(--text2);font-weight:500;">Protein heute</div>
@@ -800,20 +1131,24 @@ function drawEssen(){
     </div>
     <div class="prot-bar-bg" style="margin-top:4px;"><div class="prot-bar" style="width:${pct}%;background:var(--green);"></div></div>
   </div>`;
+
   meals.forEach((m,i)=>{
     const ok=!!log[i];
-    h+=`<div class="card" style="margin-bottom:9px;"><div class="card-row" style="border-bottom:none;">
-      <div class="check${ok?' done':''}" onclick="togMeal(${i})">${ok?'✓':''}</div>
-      <div style="flex:1;">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:3px;font-weight:500;">${m.time}</div>
-        <div style="font-size:14px;font-weight:500;line-height:1.4;">${m.item}</div>
+    const portable=isDuringSchool(m.time, sched);
+    h+=`<div class="card" style="margin-bottom:9px;${portable?'border-left:3px solid var(--orange);':''}">
+      <div class="card-row" style="border-bottom:none;">
+        <div class="check${ok?' done':''}" onclick="togMeal(${i})">${ok?'✓':''}</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:3px;font-weight:500;">${m.time}${portable?' · <span style="color:var(--orange);">🎒 Schule</span>':''}</div>
+          <div style="font-size:14px;font-weight:500;line-height:1.4;">${m.item}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:4px;">
+          <div style="font-size:13px;color:var(--text2);">~${m.prot}g P</div>
+          <button onclick="editMealItem(${i})" style="background:none;border:none;font-size:16px;cursor:pointer;padding:2px;">✎</button>
+          <button onclick="deleteMealItem(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:2px;">×</button>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:4px;">
-        <div style="font-size:13px;color:var(--text2);">~${m.prot}g P</div>
-        <button onclick="editMealItem(${i})" style="background:none;border:none;font-size:16px;cursor:pointer;padding:2px;">✎</button>
-        <button onclick="deleteMealItem(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:2px;">×</button>
-      </div>
-    </div></div>`;
+    </div>`;
   });
   h+=`<button onclick="openAddMeal()" class="btn-primary" style="margin-top:4px;margin-bottom:4px;">＋ Mahlzeit hinzufügen</button>`;
   document.getElementById('essen-body').innerHTML=h;
@@ -822,27 +1157,22 @@ function togMeal(idx){
   const key=todayKey(); if(!mealLogs[key]) mealLogs[key]={};
   mealLogs[key][idx]=!mealLogs[key][idx]; persist(); drawEssen();
 }
-function toggleSchulwoche(){
-  const cur=localStorage.getItem('fp_schulwoche');
-  const appDow=jsDayToApp(new Date().getDay());
-  const curVal=cur!==null?cur==='1':isSchool(appDow);
-  localStorage.setItem('fp_schulwoche',curVal?'0':'1');
-  drawEssen();
-}
-function customMeals(schulwoche){
-  const key='fp_meals_'+(schulwoche?'school':'free');
+function customMeals(appDow){
+  const key='fp_meals_day'+appDow;
   const saved=localStorage.getItem(key);
   if(saved) return JSON.parse(saved);
-  return schulwoche?[...SCHOOL_MEALS]:[...FREE_MEALS];
+  // Fall back: school days get SCHOOL_MEALS, weekends get FREE_MEALS
+  const sched=getSchedule()[appDow];
+  return sched&&sched.school?[...SCHOOL_MEALS]:[...FREE_MEALS];
 }
-function saveMealList(schulwoche, list){
-  const key='fp_meals_'+(schulwoche?'school':'free');
-  localStorage.setItem(key,JSON.stringify(list));
+function saveMealList(appDow, list){
+  localStorage.setItem('fp_meals_day'+appDow, JSON.stringify(list));
+}
+function getCurrentAppDow(){
+  return jsDayToApp(new Date().getDay());
 }
 function getCurrentSchulwoche(){
-  const appDow=jsDayToApp(new Date().getDay());
-  const ov=localStorage.getItem('fp_schulwoche');
-  return ov!==null?ov==='1':isSchool(appDow);
+  return getTodaySchedule().school;
 }
 let editMealIdx=null;
 function openAddMeal(){
@@ -856,8 +1186,8 @@ function openAddMeal(){
 }
 function editMealItem(idx){
   editMealIdx=idx;
-  const sw=getCurrentSchulwoche();
-  const meals=customMeals(sw);
+  const dow=getCurrentAppDow();
+  const meals=customMeals(dow);
   const m=meals[idx];
   document.getElementById('m-meal-edit-title').textContent='Mahlzeit bearbeiten';
   document.getElementById('m-meal-time').value=m.time;
@@ -867,10 +1197,10 @@ function editMealItem(idx){
   setTimeout(()=>document.getElementById('m-meal-item').focus(),200);
 }
 function deleteMealItem(idx){
-  const sw=getCurrentSchulwoche();
-  const meals=customMeals(sw);
+  const dow=getCurrentAppDow();
+  const meals=customMeals(dow);
   meals.splice(idx,1);
-  saveMealList(sw,meals);
+  saveMealList(dow,meals);
   drawEssen();
 }
 function saveMealEdit(){
@@ -878,78 +1208,116 @@ function saveMealEdit(){
   const item=document.getElementById('m-meal-item').value.trim();
   const prot=parseInt(document.getElementById('m-meal-prot').value)||0;
   if(!item){alert('Bitte eine Beschreibung eingeben.');return;}
-  const sw=getCurrentSchulwoche();
-  const meals=customMeals(sw);
+  const dow=getCurrentAppDow();
+  const meals=customMeals(dow);
   if(editMealIdx===null){
     meals.push({time,item,prot});
   } else {
     meals[editMealIdx]={time,item,prot};
   }
-  saveMealList(sw,meals);
+  saveMealList(dow,meals);
   document.getElementById('m-meal-edit').classList.remove('open');
   drawEssen();
 }
 function resetMeals(){
-  if(!confirm('Alle Mahlzeiten auf Standard zurücksetzen?')) return;
-  const sw=getCurrentSchulwoche();
-  localStorage.removeItem('fp_meals_'+(sw?'school':'free'));
+  if(!confirm('Mahlzeiten für heute auf Standard zurücksetzen?')) return;
+  const dow=getCurrentAppDow();
+  localStorage.removeItem('fp_meals_day'+dow);
   drawEssen();
 }
 
 // ─── JOGGEN (GPS + Höhenmeter) ────────────────────────────────────────────────
-let map, routeLine, watchId;
+let map, routeLine, watchId, locDot;
 let running=false, runStart, runDist=0, lastPos=null, runTimer, coords=[];
 let effort=2, elevGain=0, elevLoss=0;
 
 function initMap(){
+  // Init Leaflet — no default view yet, wait for GPS
   map=L.map('map',{zoomControl:false,attributionControl:false,preferCanvas:true});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19,
-    crossOrigin:true
-  }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
   L.control.attribution({prefix:'© OSM'}).addTo(map);
-  routeLine=L.polyline([],{color:'#007AFF',weight:5,opacity:.9}).addTo(map);
-  // Set a default view immediately so tiles start loading
+  routeLine=L.polyline([],{color:'#007AFF',weight:5,opacity:.9,lineJoin:'round'}).addTo(map);
+
+  // Blue dot marker for current position
+  locDot=L.circleMarker([0,0],{
+    radius:8, color:'#fff', weight:2,
+    fillColor:'#007AFF', fillOpacity:1
+  });
+
+  // Show GPS-searching state
+  document.getElementById('gps-status').textContent='📍 GPS wird gesucht…';
+  document.getElementById('gps-status').style.display='block';
+
+  // Set Berlin as fallback view so map isn't just grey
   map.setView([52.52,13.405],13);
-  // Then try to get real position
+  // Force size recalculation NOW
+  map.invalidateSize(false);
+
+  // Request live position with proper options
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(
-      p=>{map.setView([p.coords.latitude,p.coords.longitude],16);},
-      ()=>{}
+      p=>{
+        const lat=p.coords.latitude, lng=p.coords.longitude;
+        map.setView([lat,lng],16);
+        locDot.setLatLng([lat,lng]).addTo(map);
+        document.getElementById('gps-status').textContent='✓ GPS bereit';
+        setTimeout(()=>document.getElementById('gps-status').style.display='none',2000);
+      },
+      e=>{
+        document.getElementById('gps-status').textContent='⚠️ GPS nicht verfügbar';
+        console.warn('GPS error:',e.code, e.message);
+      },
+      {enableHighAccuracy:true, timeout:15000, maximumAge:0}
     );
+  } else {
+    document.getElementById('gps-status').textContent='⚠️ GPS nicht unterstützt';
   }
-  // Force Leaflet to recalculate container size
-  requestAnimationFrame(()=>{map.invalidateSize(false);});
+
   drawRunHist();
 }
+
 function toggleRun(){running?stopRun():startRun();}
+
 function startRun(){
+  if(!navigator.geolocation){alert('GPS nicht verfügbar');return;}
   running=true; runStart=Date.now(); runDist=0; lastPos=null; coords=[];
   elevGain=0; elevLoss=0;
   routeLine.setLatLngs([]);
   document.getElementById('run-btn').textContent='Stop';
   document.getElementById('run-btn').className='btn-danger';
   document.getElementById('r-elev').textContent='0';
+  document.getElementById('gps-status').textContent='📡 GPS aktiv';
+  document.getElementById('gps-status').style.display='block';
   runTimer=setInterval(tickTimer,1000);
-  watchId=navigator.geolocation.watchPosition(gpsUpdate,()=>{},{enableHighAccuracy:true,maximumAge:1500});
+  watchId=navigator.geolocation.watchPosition(
+    gpsUpdate,
+    e=>console.warn('GPS watch error:',e),
+    {enableHighAccuracy:true, maximumAge:0, timeout:10000}
+  );
 }
+
 function gpsUpdate(pos){
   const {latitude:lat,longitude:lng,accuracy:acc,altitude:alt,altitudeAccuracy:altAcc}=pos.coords;
-  if(acc>35) return;
+  // On iOS acc can be 5–65m, allow up to 65m so we don't block all updates
+  if(acc>65) return;
+  // Update blue dot
+  if(locDot) locDot.setLatLng([lat,lng]);
+  if(!locDot._map) locDot.addTo(map);
+
   if(lastPos){
     const d=hav(lastPos.lat,lastPos.lng,lat,lng);
-    if(d>0&&d<0.3) runDist+=d;
-    // Elevation tracking
-    if(alt!==null&&alt!==undefined&&lastPos.alt!==undefined&&(altAcc===null||altAcc<25)){
+    // Only count movement >1m and <300m per update (filter GPS jumps)
+    if(d>0.001&&d<0.3) runDist+=d;
+    if(alt!=null&&lastPos.alt!=null&&(altAcc==null||altAcc<30)){
       const dAlt=alt-lastPos.alt;
       if(dAlt>0.5) elevGain+=dAlt;
       else if(dAlt<-0.5) elevLoss+=Math.abs(dAlt);
     }
   }
-  lastPos={lat,lng,alt:(alt!==null&&alt!==undefined)?alt:undefined};
+  lastPos={lat,lng,alt:(alt!=null)?alt:null};
   coords.push([lat,lng]);
   routeLine.setLatLngs(coords);
-  map.setView([lat,lng],16);
+  map.panTo([lat,lng],{animate:true,duration:0.5});
   document.getElementById('r-km').textContent=runDist.toFixed(2);
   document.getElementById('r-elev').textContent=Math.round(elevGain);
   updatePaceDisplay();
@@ -966,9 +1334,10 @@ function updatePaceDisplay(){
 }
 function stopRun(){
   running=false; clearInterval(runTimer);
-  if(watchId!=null) navigator.geolocation.clearWatch(watchId);
+  if(watchId!=null){navigator.geolocation.clearWatch(watchId);watchId=null;}
   document.getElementById('run-btn').textContent='Start';
   document.getElementById('run-btn').className='btn-primary';
+  document.getElementById('gps-status').style.display='none';
   document.getElementById('m-run').classList.add('open');
 }
 function pickEffort(n,el){
@@ -1128,41 +1497,297 @@ function toggleShopItem(i){shoppingList[i].checked=!shoppingList[i].checked;pers
 function removeShopItem(i){shoppingList.splice(i,1);persist();drawShoppingList();}
 
 // ─── PLANER ───────────────────────────────────────────────────────────────────
-let plCurrentTab='woche';
+let plCurrentTab='makros', activityFactor=1.55, goalSurplus=250;
 function plTab(t){
   plCurrentTab=t;
-  document.getElementById('pl-woche').style.display=t==='woche'?'':'none';
-  document.getElementById('pl-bmi').style.display=t==='bmi'?'':'none';
-  document.getElementById('pl-btn-woche').classList.toggle('on',t==='woche');
-  document.getElementById('pl-btn-bmi').classList.toggle('on',t==='bmi');
+  ['makros','woche','bmi'].forEach(x=>{
+    document.getElementById('pl-'+x).style.display=x===t?'':'none';
+    document.getElementById('pl-btn-'+x).classList.toggle('on',x===t);
+  });
+  if(t==='makros') calcMakros();
+}
+function setActivity(el,v){
+  activityFactor=v;
+  document.querySelectorAll('.act-btn').forEach(b=>b.classList.toggle('on',parseFloat(b.dataset.v)===v));
+  saveMkProfile(); calcMakros();
+}
+function setGoal(el,v){
+  goalSurplus=v;
+  document.querySelectorAll('.goal-btn').forEach(b=>b.classList.toggle('on',parseFloat(b.dataset.v)===v));
+  saveMkProfile(); calcMakros();
+}
+function saveMkProfile(){
+  const p={
+    age:parseFloat(document.getElementById('mk-age').value)||16,
+    weight:parseFloat(document.getElementById('mk-weight').value)||0,
+    height:parseFloat(document.getElementById('mk-height').value)||0,
+    activity:activityFactor, goal:goalSurplus
+  };
+  localStorage.setItem('fp_mkprofile',JSON.stringify(p));
+  // Sync to planer fields too
+  if(p.weight){document.getElementById('pl-weight').value=p.weight;document.getElementById('bmi-weight').value=p.weight;}
+  if(p.height){document.getElementById('pl-height').value=p.height;document.getElementById('bmi-height').value=p.height;}
+  if(p.age){document.getElementById('pl-age').value=p.age;}
+}
+function loadMkProfile(){
+  const saved=localStorage.getItem('fp_mkprofile');
+  if(!saved) return;
+  const p=JSON.parse(saved);
+  if(p.age) document.getElementById('mk-age').value=p.age;
+  if(p.weight) document.getElementById('mk-weight').value=p.weight;
+  if(p.height) document.getElementById('mk-height').value=p.height;
+  if(p.activity){
+    activityFactor=p.activity;
+    document.querySelectorAll('.act-btn').forEach(b=>b.classList.toggle('on',parseFloat(b.dataset.v)===p.activity));
+  }
+  if(p.goal!==undefined){
+    goalSurplus=p.goal;
+    document.querySelectorAll('.goal-btn').forEach(b=>b.classList.toggle('on',parseFloat(b.dataset.v)===p.goal));
+  }
+}
+function getMkProfile(){
+  const age=parseFloat(document.getElementById('mk-age').value)||16;
+  const kg=parseFloat(document.getElementById('mk-weight').value)||0;
+  const cm=parseFloat(document.getElementById('mk-height').value)||0;
+  return {age,kg,cm};
+}
+function calcMakros(){
+  saveMkProfile();
+  const {age,kg,cm}=getMkProfile();
+  const el=document.getElementById('makros-result');
+  if(!kg||!cm){
+    el.innerHTML=`<div class="card" style="padding:20px;text-align:center;color:var(--text2);font-size:15px;">
+      Bitte Gewicht und Größe eingeben 👆
+    </div>`;
+    return;
+  }
+  // Mifflin-St Jeor (männlich)
+  const bmr=Math.round(10*kg + 6.25*cm - 5*age + 5);
+  const tdee=Math.round(bmr * activityFactor);
+  const target=tdee + goalSurplus;
+  // Makros für Muskelaufbau:
+  // Protein: 2.2g/kg (wichtigster Faktor)
+  const protG=Math.round(2.2*kg);
+  // Fett: 25% der Gesamtkalorien (mind. 0.8g/kg)
+  const fatKcal=Math.round(target*0.25);
+  const fatG=Math.round(fatKcal/9);
+  // Kohlenhydrate: Rest
+  const protKcal=protG*4;
+  const carbKcal=target-protKcal-fatKcal;
+  const carbG=Math.round(carbKcal/4);
+  // Prozentualer Anteil
+  const pPct=Math.round(protKcal/target*100);
+  const cPct=Math.round(carbKcal/target*100);
+  const fPct=100-pPct-cPct;
+  const goalLabels={250:'💪 Muskelaufbau (+250 kcal)','-300':'📉 Abnehmen (−300 kcal)','0':'⚖️ Gewicht halten'};
+  const goalLabel=goalLabels[String(goalSurplus)]||'';
+  el.innerHTML=`
+    <div class="kcal-banner">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:2px;">Tagesziel</div>
+        <div class="kcal-num">${target}</div>
+        <div style="font-size:12px;color:var(--text2);">kcal/Tag</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${goalLabel}</div>
+        <div style="font-size:13px;color:var(--text2);">Grundumsatz: <b>${bmr}</b> kcal</div>
+        <div style="font-size:13px;color:var(--text2);">Gesamtumsatz: <b>${tdee}</b> kcal</div>
+      </div>
+    </div>
+    <div class="macro-grid">
+      <div class="macro-card">
+        <div class="macro-lbl">Protein</div>
+        <div class="macro-main" style="color:var(--accent);">${protG}</div>
+        <div class="macro-unit">g / Tag</div>
+        <div class="macro-bar-bg"><div class="macro-bar" style="width:${pPct}%;background:var(--accent);"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-top:5px;">${pPct}% · ${protKcal} kcal</div>
+        <div style="font-size:11px;color:var(--text2);">= 2,2g × ${kg}kg</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-lbl">Kohlenhydrate</div>
+        <div class="macro-main" style="color:var(--green);">${carbG}</div>
+        <div class="macro-unit">g / Tag</div>
+        <div class="macro-bar-bg"><div class="macro-bar" style="width:${cPct}%;background:var(--green);"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-top:5px;">${cPct}% · ${carbKcal} kcal</div>
+        <div style="font-size:11px;color:var(--text2);">Energie für Training</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-lbl">Fett</div>
+        <div class="macro-main" style="color:var(--orange);">${fatG}</div>
+        <div class="macro-unit">g / Tag</div>
+        <div class="macro-bar-bg"><div class="macro-bar" style="width:${fPct}%;background:var(--orange);"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-top:5px;">${fPct}% · ${fatKcal} kcal</div>
+        <div style="font-size:11px;color:var(--text2);">25% der Kalorien</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-lbl">Protein/Mahlzeit</div>
+        <div class="macro-main" style="color:var(--accent);">${Math.round(protG/4)}</div>
+        <div class="macro-unit">g ∅ (4× tägl.)</div>
+        <div class="macro-bar-bg"><div class="macro-bar" style="width:100%;background:rgba(0,122,255,.3);"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-top:5px;">Ziel pro Mahlzeit</div>
+        <div style="font-size:11px;color:var(--text2);">für max. Absorption</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 16px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;">💡 Tipps für Muskelaufbau</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+        • Protein auf <b>${Math.round(protG/4)}g</b> pro Mahlzeit verteilen (max. Absorption ~40g/Mahlzeit)<br>
+        • Vor dem Training: Kohlenhydrate + Protein (z.B. Oats + Whey)<br>
+        • Nach dem Training: innerhalb 2h Protein essen<br>
+        • Wasser: mind. <b>${Math.round(kg*0.035)}L</b> täglich (${kg}kg × 35ml)<br>
+        • Schlaf: 8h — im Schlaf wird Muskel aufgebaut, nicht im Training
+      </div>
+    </div>`;
+}
+
+// ─── TAGESPLAN GENERATOR ──────────────────────────────────────────────────────
+function openTagesplan(){
+  // Load profile and compute macros
+  const prof=JSON.parse(localStorage.getItem('fp_mkprofile')||'{}');
+  const kg=prof.weight||0, cm=prof.height||0, age=prof.age||16;
+  const act=prof.activity||1.55, surplus=prof.goal!==undefined?prof.goal:250;
+  let kcalTarget=2800, protTarget=150;
+  if(kg&&cm){
+    const bmr=Math.round(10*kg+6.25*cm-5*age+5);
+    kcalTarget=Math.round(bmr*act)+surplus;
+    protTarget=Math.max(150,Math.round(2.2*kg)); // immer min. 150g
+  }
+  document.getElementById('tp-kcal').value=kcalTarget;
+
+  // Show profile summary
+  const sched=getTodaySchedule();
+  const appDow=jsDayToApp(new Date().getDay());
+  const dayName=DAYS_LONG[appDow];
+  const schulInfo=sched.school?`📚 Schultag (${sched.start}–${sched.end} Uhr) · Rewe in der Nähe`:`🏠 Freier Tag`;
+  const protInfo=kg?`💪 Protein-Ziel: <b>${protTarget}g</b> (2,2g × ${kg}kg)`:`💪 Protein-Ziel: <b>150g</b>`;
+  const kcalInfo=`🔥 Kalorien: <b>${kcalTarget} kcal</b>`;
+  document.getElementById('tp-profil-info').innerHTML=
+    `<b>${dayName}</b> · ${schulInfo}<br>${kcalInfo} · ${protInfo}`;
+
+  document.getElementById('m-tagesplan').classList.add('open');
+}
+
+async function generateTagesplan(){
+  const apiKey=localStorage.getItem('fp_apikey');
+  if(!apiKey){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
+
+  const appDow=jsDayToApp(new Date().getDay());
+  const sched=getTodaySchedule();
+  const kcal=parseInt(document.getElementById('tp-kcal').value)||2800;
+  const jogCb=document.getElementById('tp-jog-cb').checked;
+  const trainCb=document.getElementById('tp-train-cb').checked;
+  const jogTime=jogCb?document.getElementById('tp-jog-hour').value:null;
+
+  // Get profile for protein target
+  const prof=JSON.parse(localStorage.getItem('fp_mkprofile')||'{}');
+  const kg=prof.weight||70;
+  const protTarget=Math.max(150,Math.round(2.2*kg));
+  const fatG=Math.round(kcal*0.25/9);
+  const carbG=Math.round((kcal-protTarget*4-fatG*9)/4);
+
+  const resultEl=document.getElementById('tp-result');
+  resultEl.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2);">⏳ Erstelle deinen Plan…</div>';
+
+  // Build detailed context
+  let schulKontext='';
+  if(sched.school){
+    schulKontext=`SCHULTAG: Du bist von ${sched.start} bis ${sched.end} Uhr in der Schule.
+- Mahlzeiten in dieser Zeit müssen entweder mitgebracht (Meal-Prep, Tupperware) oder schnell beim Rewe/Edeka nebenan zu kaufen sein.
+- Kein Kochen möglich während Schulzeit.
+- Markiere diese Mahlzeiten mit 🎒.`;
+  } else {
+    schulKontext=`FREIER TAG: Du kannst den ganzen Tag zuhause kochen.`;
+  }
+
+  let trainKontext='Kein Training heute.';
+  if(trainCb) trainKontext=`Kraft-Training heute — berücksichtige Pre-Workout Kohlenhydrate (1–2h vorher) und Post-Workout Protein (innerhalb 30 Min danach).`;
+  if(jogTime){
+    const [hh,mm]=jogTime.split(':').map(Number);
+    const preTotalMin=hh*60+mm-90;
+    const preH=Math.floor(preTotalMin/60), preM=preTotalMin%60;
+    const preStr=`${String(preH).padStart(2,'0')}:${String(preM<0?0:preM).padStart(2,'0')}`;
+    trainKontext+=(trainCb?' ':'')
+      +`Joggen um ${jogTime} Uhr — letzte größere Mahlzeit spätestens ${preStr} Uhr (90 Min vorher). Danach Protein-Snack.`;
+  }
+
+  const prompt=`Erstelle einen KOMPLETTEN Mahlzeitenplan für heute (${DAYS_LONG[appDow]}).
+
+KONTEXT:
+${schulKontext}
+${trainKontext}
+
+MAKRO-ZIELE (PFLICHT — MÜSSEN EXAKT EINGEHALTEN WERDEN):
+- Kalorien: ${kcal} kcal (±50 kcal Toleranz)
+- Protein: MINDESTENS ${protTarget}g — das ist das wichtigste Ziel!
+- Fett: ca. ${fatG}g
+- Kohlenhydrate: ca. ${carbG}g
+
+REGELN:
+1. Protein auf alle Mahlzeiten verteilen (max. 40g pro Mahlzeit für optimale Absorption)
+2. Frühstück muss proteinreich sein (mind. 30g) — z.B. Eier, Quark, Magerquark
+3. Letzte Mahlzeit: caseinreiches Protein (Quark/Magerquark) für Regeneration im Schlaf
+4. Nur Lebensmittel die im Edeka/Rewe erhältlich sind
+5. Einfache Zubereitung — max. 15 Min pro Mahlzeit
+6. Verwende konkrete Mengen in Gramm
+
+FORMAT (für jede Mahlzeit):
+⏰ [Uhrzeit] — **[Name der Mahlzeit]** [🎒 wenn Schulzeit]
+📦 Zutaten: [konkrete Mengen in g/ml/Stück]
+🔢 Makros: [kcal] kcal | [prot]g P | [carb]g KH | [fat]g F
+
+Am Ende:
+📊 TAGESGESAMT: [kcal] kcal | [prot]g Protein | [carb]g KH | [fat]g Fett`;
+
+  const result=await callClaude(prompt,
+    `Du bist ein präziser Ernährungsberater für einen Jugendlichen mit Muskelaufbau-Ziel. 
+Antworte NUR auf Deutsch. 
+Das Protein-Ziel von ${protTarget}g ist NICHT verhandelbar — rechne die Mahlzeiten so, dass es erreicht wird.
+Sei konkret mit Mengenangaben. Keine Floskeln oder Einleitungen.`
+  );
+
+  if(result){
+    const html=result
+      .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+      .replace(/⏰/g,'<span style="color:var(--text2)">⏰</span>')
+      .replace(/📦/g,'<span style="color:var(--green)">📦</span>')
+      .replace(/🔢/g,'<span style="color:var(--accent)">🔢</span>')
+      .replace(/📊/g,'<span style="color:var(--orange)">📊</span>')
+      .replace(/\n\n/g,'</p><p style="margin-top:12px;">')
+      .replace(/\n/g,'<br>');
+    resultEl.innerHTML=`<div style="font-size:13px;line-height:1.85;background:var(--bg);border-radius:12px;padding:14px;"><p>${html}</p></div>`;
+  } else { resultEl.innerHTML=''; }
 }
 
 async function generateWeekPlan(){
   const key=localStorage.getItem('fp_apikey');
   if(!key){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
-  const schoolDays=[...document.querySelectorAll('.school-day-cb:checked')].map(c=>c.value);
-  const start=document.getElementById('school-start').value;
-  const end=document.getElementById('school-end').value;
+  const sched=getSchedule();
   const weight=document.getElementById('pl-weight').value||'70';
   const height=document.getElementById('pl-height').value||'175';
   const age=document.getElementById('pl-age').value||'16';
-  if(!schoolDays.length){alert('Mindestens einen Schultag auswählen!');return;}
   const resultEl=document.getElementById('plan-result');
   resultEl.innerHTML='<div class="ai-loading">⏳ KI erstellt deinen Plan…</div>';
+  // Build schedule summary from Stundenplan
+  const schedSummary=DAYS_LONG.map((day,i)=>{
+    const d=sched[i];
+    return d.school?`${day}: Schule ${d.start}–${d.end} Uhr`:`${day}: frei`;
+  }).join('\n');
   const prompt=`Erstelle einen detaillierten Wochenplan (Montag bis Sonntag) für einen ${age}-jährigen Schüler.
 Profil: ${height}cm, ${weight}kg, Ziel: Muskelaufbau (primär), gesund & fit.
-Schultage: ${schoolDays.join(', ')} von ${start} bis ${end} Uhr.
-Protein-Ziel: mindestens ${Math.round(parseFloat(weight||70)*2)}g/Tag.
+Protein-Ziel: 160g/Tag, ca. ${Math.round(parseFloat(weight||70)*35)} kcal/Tag.
 
-Für jeden Tag (Mo–So) gib an:
-- Alle Mahlzeiten mit Uhrzeit und ungefähren Makros (kcal, Protein)
-- An Schultagen: was man in der Schule essen/trinken kann (Snacks im Rucksack)
-- Training oder Ruhetag (passend zum bestehenden Wochenplan)
-- Gesamt-Kalorien und Protein des Tages
+Stundenplan:
+${schedSummary}
 
-Schreibe praktisch, mit echten Lebensmitteln, die in Deutschland leicht erhältlich sind.`;
-  const result=await callClaude(prompt,'Du bist ein erfahrener Fitness- und Ernährungsberater. Antworte auf Deutsch. Sei konkret und praktisch. Keine Floskeln.');
-  if(result) resultEl.innerHTML=`<div class="ai-result">${result}</div>`;
+Für jeden Tag gib an:
+- Alle Mahlzeiten mit Uhrzeit und Makros (kcal, Protein)
+- An Schultagen: Mahlzeiten in der Schulzeit als 🎒 markieren (kein Kochen)
+- Training oder Ruhetag (passend zum Wochenplan)
+- Tagesgesamt: kcal und Protein
+
+Praktisch, echte Lebensmittel, Deutschland.`;
+  const result=await callClaude(prompt,'Du bist ein erfahrener Fitness- und Ernährungsberater. Antworte auf Deutsch. Konkret und praktisch.');
+  if(result) resultEl.innerHTML=`<div class="ai-result">${result.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
   else resultEl.innerHTML='';
 }
 
@@ -1204,33 +1829,8 @@ function calcBMI(){
 }
 
 // ─── MAHLZEITEN GENERATOR ─────────────────────────────────────────────────────
-function openMealGen(){document.getElementById('m-meal').classList.add('open');}
-function closeMealGen(){document.getElementById('m-meal').classList.remove('open');document.getElementById('mg-result').innerHTML='';}
-function mgType(t){
-  mgMealType=t;
-  ['Frühstück','Mittagessen','Abendessen','Snack'].forEach((x,i)=>{
-    document.getElementById('mg-btn-'+(i+1)).classList.toggle('on',x===t);
-  });
-}
-async function generateMeal(){
-  const key=localStorage.getItem('fp_apikey');
-  if(!key){alert('Bitte zuerst API-Key unter Mehr → API eintragen.');return;}
-  const kcal=document.getElementById('mg-kcal').value||500;
-  const sw=getCurrentSchulwoche();
-  document.getElementById('mg-result').innerHTML='<div style="text-align:center;padding:16px;color:var(--text2);">⏳ Generiere Ideen…</div>';
-  const kontext=sw?`Es ist ein Schultag (7:35–16:00 Uhr nicht zuhause). Ein Rewe ist in der Nähe der Schule. Mahlzeiten unter Tags müssen praktisch und transportierbar sein oder schnell beim Rewe kaufbar.`:`Es ist ein freier Tag, alle Mahlzeiten können zuhause zubereitet werden.`;
-  const prompt=`Gib mir 3 kreative ${mgMealType}-Ideen für einen Jugendlichen mit Ziel Muskelaufbau.
-Kalorien: ca. ${kcal} kcal pro Mahlzeit. ${kontext}
-Anforderungen: hoher Proteingehalt, in Deutschland erhältlich (Edeka/Rewe), nicht zu aufwändig.
-
-Format für jede Idee:
-**[Name]**
-Zutaten: [Liste]
-Zubereitung: [1-2 Sätze]
-Makros: ~[kcal] kcal | ~[prot]g Protein | ~[carb]g KH | ~[fat]g Fett`;
-  const result=await callClaude(prompt,'Du bist ein Ernährungsberater mit Fokus auf Muskelaufbau für Jugendliche. Antworte auf Deutsch. Sei kreativ aber praktisch.');
-  if(result) document.getElementById('mg-result').innerHTML=`<div style="font-size:14px;line-height:1.75;">${result.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
-}
+// openMealGen → jetzt Tagesplan
+function openMealGen(){openTagesplan();}
 
 // ─── KI TRAININGSPLAN GENERATOR ───────────────────────────────────────────────
 async function generateTrainPlan(){
@@ -1282,12 +1882,13 @@ Format: Tag → Trainingstyp → Übungen mit Gewicht`;
 let mehrCurrentTab='fort';
 function mehrTab(t){
   mehrCurrentTab=t;
-  ['fort','lex','set'].forEach(x=>{
+  ['fort','lex','stp','set'].forEach(x=>{
     document.getElementById('mehr-'+x).style.display=x===t?'':'none';
     document.getElementById('mehr-btn-'+x).classList.toggle('on',x===t);
   });
   if(t==='fort') drawFortschritt();
   if(t==='lex') drawLexikon();
+  if(t==='stp') drawStundenplan();
   if(t==='set'){
     const k=localStorage.getItem('fp_apikey')||'';
     document.getElementById('api-key-input').value=k?'sk-ant-***gespeichert***':'';
@@ -1423,15 +2024,13 @@ function paceNum(str){
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 drawTraining();
 drawLexikon();
+loadMkProfile();
 
 // Close modals on backdrop tap
-['m-edit','m-run','m-food','m-meal','m-meal-edit'].forEach(id=>{
+['m-edit','m-run','m-food','m-meal-edit','m-ex-edit','m-tagesplan'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this) this.classList.remove('open');});
 });
 
-// Prevent double-tap zoom
-let lt=0;
-document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<280)e.preventDefault();lt=n;},{passive:false});
 </script>
 </body>
 </html>
